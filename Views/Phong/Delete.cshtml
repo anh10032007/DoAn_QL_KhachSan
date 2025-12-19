@@ -1,0 +1,32 @@
+﻿@model QL_KhachSan.tblPhong
+
+@{ ViewBag.Title = "Xóa phòng"; }
+
+<div class="card shadow mt-4 col-md-6 mx-auto border-danger">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0 fw-bold"><i class="fas fa-trash-alt"></i> Xác Nhận Xóa</h4>
+    </div>
+    <div class="card-body text-center">
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-warning">@ViewBag.Error</div>
+        }
+
+        <h5 class="card-title">Bạn có chắc muốn xóa phòng này?</h5>
+        <h2 class="text-danger fw-bold display-4">P.@Model.SoPhong</h2>
+
+        <p class="text-muted">
+            Loại: @Model.tblLoaiPhong.TenLoai <br />
+            Trạng thái: @Model.TrangThai
+        </p>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="mt-4">
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Hủy bỏ</a>
+                <button type="submit" class="btn btn-danger px-4">Xác nhận Xóa</button>
+            </div>
+        }
+    </div>
+</div>

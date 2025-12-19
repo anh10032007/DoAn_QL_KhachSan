@@ -1,0 +1,105 @@
+﻿@model QL_KhachSan.tblKhachHang
+
+@{
+    ViewBag.Title = "Thêm Khách Hàng Mới";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg border-0 mt-3">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold"><i class="fas fa-user-plus me-2"></i> Thêm Khách Hàng Mới</h4>
+            </div>
+
+            <div class="card-body p-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+                                @Html.EditorFor(model => model.TenKH, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập họ tên khách..." } })
+                                @Html.ValidationMessageFor(model => model.TenKH, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Số CCCD/CMND <span class="text-danger">*</span></label>
+                                @Html.EditorFor(model => model.CCCD, new { htmlAttributes = new { @class = "form-control", placeholder = "Nhập số định danh..." } })
+                                @Html.ValidationMessageFor(model => model.CCCD, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Giới tính</label>
+                                @* Tự tạo Dropdown chọn Giới tính thay vì nhập tay *@
+                                @Html.DropDownListFor(model => model.GioiTinh, new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Nam", Value = "Nam" },
+                                    new SelectListItem { Text = "Nữ", Value = "Nữ" },
+                                    new SelectListItem { Text = "Khác", Value = "Khác" }
+                                }, "--- Chọn giới tính ---", new { @class = "form-select" })
+
+                                @Html.ValidationMessageFor(model => model.GioiTinh, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Năm sinh</label>
+                                @Html.EditorFor(model => model.NamSinh, new { htmlAttributes = new { @class = "form-control", type = "number", min = "1900", max = DateTime.Now.Year } })
+                                @Html.ValidationMessageFor(model => model.NamSinh, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    @Html.EditorFor(model => model.DienThoai, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => model.DienThoai, "", new { @class = "text-danger small" })
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", type = "email" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small" })
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ thường trú</label>
+                            @Html.TextAreaFor(model => model.DiaChi, new { @class = "form-control", rows = 2, placeholder = "Nhập địa chỉ..." })
+                            @Html.ValidationMessageFor(model => model.DiaChi, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Mật khẩu (Cho khách online)</label>
+                            @Html.PasswordFor(model => model.MatKhau, new { @class = "form-control", placeholder = "Để trống nếu không cần tài khoản online" })
+                            @Html.ValidationMessageFor(model => model.MatKhau, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fas fa-save"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

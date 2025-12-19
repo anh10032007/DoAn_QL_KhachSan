@@ -1,0 +1,128 @@
+﻿@model QL_KhachSan.tblHoaDon
+
+@{
+    ViewBag.Title = "Chi Tiết Hóa Đơn";
+
+    // Lấy chi tiết phòng
+    var ctPhong = Model.tblChiTietHoaDons.FirstOrDefault();
+    string tenPhong = ctPhong != null ? ctPhong.tblPhong.SoPhong : "---";
+    decimal giaPhong = ctPhong != null ? (decimal)ctPhong.DonGiaThucTe : 0;
+    int soNgay = ViewBag.SoNgay ?? 1;
+    decimal thanhTienPhong = giaPhong * soNgay;
+}
+
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg" id="printArea">
+                <div class="card-header bg-white border-bottom-0 pb-0 text-center">
+                    <h3 class="fw-bold text-uppercase">Hóa Đơn Thanh Toán</h3>
+                    <p class="text-muted mb-1">Khách Sạn ABC - 123 Đường Code Dạo, Hà Nội</p>
+                    <p class="text-muted small">Hotline: 0909.999.888</p>
+                    <hr />
+                </div>
+
+                <div class="card-body px-5">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Khách hàng:</strong> @Model.tblKhachHang.TenKH</p>
+                            <p class="mb-1"><strong>SĐT:</strong> @Model.tblKhachHang.DienThoai</p>
+                            <p class="mb-1"><strong>Địa chỉ:</strong> @Model.tblKhachHang.DiaChi</p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <p class="mb-1"><strong>Mã HĐ:</strong> #@Model.MaHD</p>
+                            <p class="mb-1"><strong>Ngày lập:</strong> @string.Format("{0:dd/MM/yyyy}", Model.NgayLap)</p>
+                            <p class="mb-1"><strong>Nhân viên:</strong> @(Model.tblNhanVien != null ? Model.tblNhanVien.TenNV : "Admin")</p>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered border-dark">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th>Nội dung</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng/Ngày</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Thuê phòng <strong>@tenPhong</strong></td>
+                                <td class="text-end">@string.Format("{0:N0}", giaPhong)</td>
+                                <td class="text-center">@soNgay ngày</td>
+                                <td class="text-end">@string.Format("{0:N0}", thanhTienPhong)</td>
+                            </tr>
+
+                            @* <tr>
+                                    <td>Nước suối</td>
+                                    <td class="text-end">10,000</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-end">20,000</td>
+                                </tr>
+                            *@
+
+                            <tr class="fw-bold fs-5">
+                                <td colspan="3" class="text-end">TỔNG CỘNG:</td>
+                                <td class="text-end text-danger">@string.Format("{0:N0}", thanhTienPhong) đ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row mt-4 mb-5">
+                        <div class="col-6 text-center">
+                            <p class="fst-italic">Khách hàng</p>
+                            <br /><br />
+                            <small>(Ký tên)</small>
+                        </div>
+                        <div class="col-6 text-center">
+                            <p class="fst-italic">Người lập phiếu</p>
+                            <br /><br />
+                            <strong>@(Model.tblNhanVien != null ? Model.tblNhanVien.TenNV : "Admin")</strong>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-muted fst-italic">
+                        <small>Cảm ơn quý khách và hẹn gặp lại!</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4 no-print">
+                <a href="@Url.Action("Index")" class="btn btn-secondary me-2"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                <button onclick="window.print()" class="btn btn-primary me-2"><i class="fas fa-print"></i> In Hóa Đơn</button>
+
+                @if (Model.DaThanhToan != true)
+                {
+                    <a href="@Url.Action("Checkout", new { id = Model.MaHD })" class="btn btn-success" onclick="return confirm('Xác nhận thanh toán?');">
+                        <i class="fas fa-money-bill-wave"></i> Xác Nhận Thanh Toán
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printArea, #printArea * {
+            visibility: visible;
+        }
+
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .no-print {
+            display: none;
+        }
+    }
+</style>

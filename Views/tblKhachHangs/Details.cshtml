@@ -1,0 +1,46 @@
+﻿@model QL_KhachSan.tblKhachHang
+
+@{
+    ViewBag.Title = "Hồ Sơ Khách Hàng";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0 mt-4">
+            <div class="card-header bg-info text-white py-3">
+                <h4 class="mb-0 fw-bold"><i class="fas fa-id-card"></i> Hồ Sơ Khách Hàng</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold text-muted">Họ và tên:</div>
+                    <div class="col-md-8 fs-5 text-primary fw-bold">@Model.TenKH</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold text-muted">CCCD/CMND:</div>
+                    <div class="col-md-8">@Model.CCCD</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold text-muted">Giới tính / Năm sinh:</div>
+                    <div class="col-md-8">@Model.GioiTinh - @Model.NamSinh</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold text-muted">Liên hệ:</div>
+                    <div class="col-md-8">
+                        <i class="fas fa-phone text-success"></i> @Model.DienThoai <br />
+                        <i class="fas fa-envelope text-warning"></i> @Model.Email
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold text-muted">Địa chỉ:</div>
+                    <div class="col-md-8">@Model.DiaChi</div>
+                </div>
+
+                <hr />
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+                    <a href="@Url.Action("Edit", new { id = Model.MaKH })" class="btn btn-warning"><i class="fas fa-edit"></i> Chỉnh sửa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

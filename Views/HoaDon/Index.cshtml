@@ -1,0 +1,96 @@
+﻿@model IEnumerable<QL_KhachSan.tblHoaDon>
+
+@{
+    ViewBag.Title = "Quản Lý Đặt Phòng";
+}
+
+<div class="card shadow-sm mt-3">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> Danh Sách Đặt Phòng</h4>
+        <a href="@Url.Action("Create")" class="btn btn-light text-primary fw-bold">
+            <i class="fas fa-plus-circle"></i> Check-in Mới
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Mã HĐ</th>
+                        <th class="text-start">Khách Hàng</th>
+                        <th>Phòng</th>
+                        <th>Ngày Check-in</th>
+                        <th>Ngày Check-out</th>
+                        <th class="text-end">Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center">#@item.MaHD</td>
+                                <td class="fw-bold">
+                                    <a href="@Url.Action("Details", new { id = item.MaHD })" class="text-decoration-none">
+                                        @(item.tblKhachHang != null ? item.tblKhachHang.TenKH : "Khách vãng lai")
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    @* Lấy số phòng từ bảng Chi tiết *@
+                                    @{
+                                        var phong = item.tblChiTietHoaDons.FirstOrDefault();
+                                        string tenPhong = phong != null && phong.tblPhong != null ? phong.tblPhong.SoPhong : "---";
+                                    }
+                                    <span class="badge bg-info text-dark">P.@tenPhong</span>
+                                </td>
+                                <td class="text-center">@string.Format("{0:dd/MM/yyyy HH:mm}", item.NgayCheckIn)</td>
+                                <td class="text-center">
+                                    @(item.NgayCheckOut.HasValue ? string.Format("{0:dd/MM/yyyy HH:mm}", item.NgayCheckOut) : "-")
+                                </td>
+                                <td class="text-end fw-bold text-success">
+                                    @(item.TongTien.HasValue ? string.Format("{0:N0} đ", item.TongTien) : "0 đ")
+                                </td>
+                                <td class="text-center">
+                                    @if (item.DaThanhToan == true)
+                                    {
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Đã thanh toán</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Đang ở</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (item.DaThanhToan != true)
+                                    {
+                                        <a href="@Url.Action("Checkout", new { id = item.MaHD })"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Xác nhận khách trả phòng và thanh toán hóa đơn này?');">
+                                            <i class="fas fa-money-bill-wave"></i> Trả Phòng
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-secondary" disabled>Đã xong</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3"></i><br />
+                                Chưa có dữ liệu đặt phòng nào.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+﻿@model QL_KhachSan.tblKhachHang
+
+@{
+    ViewBag.Title = "Xóa Khách Hàng";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-danger mt-5">
+            <div class="card-header bg-danger text-white py-3 text-center">
+                <h4 class="mb-0 fw-bold"><i class="fas fa-exclamation-triangle"></i> Xác Nhận Xóa</h4>
+            </div>
+            <div class="card-body text-center p-4">
+                <h5 class="card-title text-muted mb-4">Bạn có chắc chắn muốn xóa khách hàng này?</h5>
+
+                <div class="avatar-circle bg-light mb-3 mx-auto" style="width: 80px; height: 80px; line-height: 80px; border-radius: 50%;">
+                    <i class="fas fa-user-times fa-3x text-danger"></i>
+                </div>
+
+                <h3 class="fw-bold text-danger">@Model.TenKH</h3>
+                <p class="text-muted">CCCD: @Model.CCCD | SĐT: @Model.DienThoai</p>
+
+                <div class="alert alert-warning small">
+                    <i class="fas fa-info-circle"></i> Lưu ý: Nếu khách hàng này đã từng đặt phòng, bạn có thể sẽ không xóa được do ràng buộc dữ liệu.
+                </div>
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="mt-4 d-flex justify-content-center gap-3">
+                        <a href="@Url.Action("Index")" class="btn btn-secondary px-4">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">Xác nhận Xóa</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

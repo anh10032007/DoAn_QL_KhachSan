@@ -1,0 +1,69 @@
+﻿@model IEnumerable<QL_KhachSan.tblKhachHang>
+
+@{
+    ViewBag.Title = "Danh Sách Khách Hàng";
+}
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0 fw-bold"><i class="fas fa-users"></i> Danh Sách Khách Hàng</h4>
+        <a href="@Url.Action("Create")" class="btn btn-light text-primary fw-bold">
+            <i class="fas fa-user-plus"></i> Thêm Khách Mới
+        </a>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Họ Tên</th>
+                        <th>CCCD/CMND</th>
+                        <th>Giới Tính</th>
+                        <th>Năm Sinh</th>
+                        <th>Điện Thoại</th>
+                        <th>Email</th>
+                        <th>Địa Chỉ</th>
+                        <th class="text-center" width="150px">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">@item.TenKH</td>
+                            <td>@item.CCCD</td>
+                            <td>
+                                @if (item.GioiTinh == "Nam")
+                                {
+                                    <span class="badge bg-info text-dark"><i class="fas fa-male"></i> Nam</span>
+                                }
+                                else if (item.GioiTinh == "Nữ")
+                                {
+                                    <span class="badge bg-danger"><i class="fas fa-female"></i> Nữ</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Khác</span>
+                                }
+                            </td>
+                            <td>@item.NamSinh</td>
+                            <td>@item.DienThoai</td>
+                            <td>@(string.IsNullOrEmpty(item.Email) ? "-" : item.Email)</td>
+                            <td class="text-truncate" style="max-width: 150px;" title="@item.DiaChi">
+                                @item.DiaChi
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="@Url.Action("Edit", new { id=item.MaKH })" class="btn btn-warning" title="Sửa"><i class="fas fa-edit"></i></a>
+                                    <a href="@Url.Action("Details", new { id=item.MaKH })" class="btn btn-info text-white" title="Chi tiết"><i class="fas fa-eye"></i></a>
+                                    <a href="@Url.Action("Delete", new { id=item.MaKH })" class="btn btn-danger" title="Xóa"><i class="fas fa-trash-alt"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

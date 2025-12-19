@@ -1,0 +1,56 @@
+﻿@model QL_KhachSan.tblPhong
+
+@{ ViewBag.Title = "Cập nhật thông tin phòng"; }
+
+<div class="card shadow mt-4 col-md-8 mx-auto">
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0 fw-bold"><i class="fas fa-edit"></i> Sửa Phòng @Model.SoPhong</h4>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Edit", "Phong", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.MaPhong) <div class="form-horizontal">
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold">Số Phòng</label>
+                        @Html.EditorFor(model => model.SoPhong, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Tầng</label>
+                        @Html.EditorFor(model => model.Tang, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Loại Phòng</label>
+                    @Html.DropDownList("MaLoai", null, htmlAttributes: new { @class = "form-select" })
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Mô tả chi tiết</label>
+                    @Html.TextAreaFor(model => model.MoTaChiTiet, new { @class = "form-control", rows = 3 })
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Ảnh đại diện</label>
+                    <div class="d-flex align-items-center">
+                        @if (!string.IsNullOrEmpty(Model.AnhDaiDien))
+                        {
+                            <img src="~/Content/Images/@Model.AnhDaiDien" width="80" class="me-3 rounded border" />
+                        }
+                        <input type="file" name="HinhAnh" class="form-control" accept="image/*" />
+                    </div>
+                    <small class="text-muted">Bỏ qua nếu không muốn thay đổi ảnh.</small>
+                </div>
+
+                <hr />
+                <div class="text-end">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Quay lại</a>
+                    <button type="submit" class="btn btn-warning px-4">Lưu thay đổi</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>

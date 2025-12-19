@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Hệ Thống Quản Lý Khách Sạn</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* CSS Tùy chỉnh cho đẹp hơn */
+        body {
+            background-color: #f8f9fa; /* Màu nền xám hiện đại */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Tạo bóng cho menu */
+            background: linear-gradient(to right, #2c3e50, #4ca1af); /* Màu gradient sang trọng */
+        }
+
+        .container.body-content {
+            flex: 1; /* Đẩy footer xuống đáy */
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            background-color: #e9ecef;
+            padding: 15px 0;
+            margin-top: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="@Url.Action("Index", "Home")">
+                <i class="fas fa-hotel"></i> QL KHÁCH SẠN
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Trang Chủ
+                        </a>
+                    </li>
+
+                    @if (Session["User"] != null)
+                    {
+                        // Lấy vai trò (1:Admin, 2:Lễ tân...)
+                        int vt = Convert.ToInt32(Session["VaiTro"]);
+
+                        // Menu xem sơ đồ phòng (Ai cũng thấy)
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Phong")">
+                                <i class="fas fa-th"></i> Sơ Đồ Phòng
+                            </a>
+                        </li>
+
+                        // Menu nghiệp vụ (Admin + Lễ tân)
+                        if (vt == 1 || vt == 2)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "HoaDon")">
+                                    <i class="fas fa-file-invoice-dollar"></i> Quản Lý Đặt Phòng
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "tblKhachHangs")">
+                                    <i class="fas fa-users"></i> Khách Hàng
+                                </a>
+                            </li>
+                        }
+
+                        // Menu Quản trị (Chỉ Admin)
+                        if (vt == 1)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cogs"></i> Quản Trị
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "NhanVien")">Quản lý Nhân viên</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("BaoCao", "Admin")">Báo cáo Doanh thu</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Log", "Admin")">Nhật ký hệ thống</a></li>
+                                </ul>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <ul class="navbar-nav">
+                    @if (Session["User"] != null)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                Xin chào, <strong>@Session["TenHienThi"]</strong>
+                                @if (Convert.ToInt32(Session["VaiTro"]) == 1)
+                                {<span class="badge bg-danger">Admin</span>}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Login", "Account")"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year - Hệ Thống Quản Lý Khách Sạn (Đồ án CNPM)</p>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,66 @@
+﻿@* Lưu ý: Model ở đây là kết quả của Stored Procedure *@
+@model IEnumerable<QL_KhachSan.sp_BaoCaoDoanhThu_Result>
+
+@{
+    ViewBag.Title = "Báo Cáo Doanh Thu";
+}
+
+<h2 class="text-center text-uppercase mb-4">📊 Báo Cáo Doanh Thu Tháng @ViewBag.Thang/@ViewBag.Nam</h2>
+
+<form method="get" action="@Url.Action("BaoCao", "Admin")" class="row g-3 mb-4 bg-light p-3 rounded shadow-sm">
+    <div class="col-auto">
+        <label class="col-form-label fw-bold">Tháng:</label>
+    </div>
+    <div class="col-auto">
+        <input type="number" name="thang" value="@ViewBag.Thang" class="form-control" min="1" max="12">
+    </div>
+    <div class="col-auto">
+        <label class="col-form-label fw-bold">Năm:</label>
+    </div>
+    <div class="col-auto">
+        <input type="number" name="nam" value="@ViewBag.Nam" class="form-control">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Xem báo cáo</button>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped table-hover shadow-sm">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Ngày</th>
+                <th>Số lượng đơn</th>
+                <th>Doanh thu (VNĐ)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                decimal tongDoanhThu = 0;
+                int tongDon = 0;
+            }
+            @foreach (var item in Model)
+            {
+                tongDoanhThu += item.DoanhThu ?? 0;
+                tongDon += item.SoLuongDon ?? 0;
+                <tr>
+                    <td class="text-center">@item.Ngay/@ViewBag.Thang/@ViewBag.Nam</td>
+                    <td class="text-center">@item.SoLuongDon</td>
+                    <td class="text-end fw-bold text-success">@string.Format("{0:N0}", item.DoanhThu) đ</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot class="table-secondary fw-bold">
+            <tr>
+                <td class="text-center">TỔNG CỘNG</td>
+                <td class="text-center">@tongDon</td>
+                <td class="text-end text-danger fs-5">@string.Format("{0:N0}", tongDoanhThu) đ</td>
+            </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning text-center">Không có dữ liệu doanh thu cho tháng này.</div>
+}

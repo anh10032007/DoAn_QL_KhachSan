@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Đăng Nhập Hệ Thống";
+    Layout = null; // Trang login thường đứng riêng, không dùng menu chung
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Đăng Nhập - Quản Lý Khách Sạn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h3 class="text-center text-primary mb-4"><i class="fas fa-hotel"></i> QL Khách Sạn</h3>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-center">@ViewBag.Error</div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập</label>
+                <input type="text" name="user" class="form-control" placeholder="Nhập tên đăng nhập..." required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" name="pass" class="form-control" placeholder="Nhập mật khẩu..." required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2">Đăng Nhập</button>
+        }
+        <div class="text-center mt-3">
+            <small class="text-muted">Đồ án Công nghệ phần mềm</small>
+        </div>
+    </div>
+</body>
+</html>
