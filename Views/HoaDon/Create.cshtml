@@ -1,60 +1,44 @@
 ﻿@model QL_KhachSan.tblHoaDon
 
 @{
-    ViewBag.Title = "Check-in Khách Hàng";
+    ViewBag.Title = "Đặt Phòng Mới";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow border-0 mt-4">
+    <div class="col-md-6">
+        <div class="card shadow mt-4">
             <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><i class="fas fa-key"></i> Phiếu Nhận Phòng (Check-in)</h4>
+                <h4 class="mb-0 fw-bold"><i class="fas fa-key"></i> Phiếu Nhận Phòng (Check-in)</h4>
             </div>
             <div class="card-body p-4">
-                @using (Html.BeginForm())
+                @using (Html.BeginForm()) 
                 {
                     @Html.AntiForgeryToken()
-
-                    <div class="form-horizontal">
-                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Khách hàng</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                @Html.DropDownList("MaKH", null, "--- Chọn khách hàng ---", htmlAttributes: new { @class = "form-select" })
-                                <a href="@Url.Action("Create", "tblKhachHangs")" class="btn btn-outline-secondary" title="Thêm khách mới">
-                                    <i class="fas fa-plus"></i>
-                                </a>
-                            </div>
-                            <small class="text-muted">Nếu khách chưa có trong danh sách, hãy thêm mới trước.</small>
+                    
+                    <div class="mb-3">
+                        <label class="fw-bold">Khách Hàng</label>
+                        <div class="input-group">
+                            @Html.DropDownList("MaKH", null, "--- Chọn khách hàng ---", new { @class = "form-select" })
+                            <a href="/KhachHang/Create" class="btn btn-outline-secondary" title="Thêm khách mới"><i class="fas fa-plus"></i></a>
                         </div>
+                    </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Chọn Phòng Trống</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-bed"></i></span>
-                                @Html.DropDownList("MaPhong", null, "--- Chọn phòng ---", htmlAttributes: new { @class = "form-select" })
-                            </div>
-                            <small class="text-success"><i class="fas fa-info-circle"></i> Chỉ hiển thị các phòng đang ở trạng thái 'Trống'.</small>
-                        </div>
+                    <div class="mb-3">
+                        <label class="fw-bold text-success">Chọn Phòng Trống</label>
+                        @Html.DropDownList("MaPhong", null, "--- Chọn phòng ---", new { @class = "form-select form-select-lg" })
+                        <small class="text-muted fst-italic">* Giá hiển thị là giá niêm yết theo ngày.</small>
+                    </div>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Ghi chú (Nếu có)</label>
-                            @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 3, placeholder = "VD: Khách yêu cầu thêm chăn, check-out muộn..." })
-                            @Html.ValidationMessageFor(model => model.GhiChu, "", new { @class = "text-danger" })
-                        </div>
+                    <div class="mb-3">
+                        <label class="fw-bold">Ghi chú (Nếu có)</label>
+                        @Html.TextAreaFor(model => model.GhiChu, new { @class = "form-control", rows = 3, placeholder = "VD: Khách check-in sớm, khách VIP..." })
+                    </div>
 
-                        <hr />
-
-                        <div class="d-flex justify-content-between">
-                            <a href="@Url.Action("Index")" class="btn btn-secondary px-4">
-                                <i class="fas fa-arrow-left"></i> Quay lại
-                            </a>
-                            <button type="submit" class="btn btn-success px-4 fw-bold">
-                                <i class="fas fa-check"></i> Xác Nhận Check-in
-                            </button>
-                        </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">Quay lại</a>
+                        <button type="submit" class="btn btn-success px-4 fw-bold">
+                            <i class="fas fa-check-circle"></i> Xác Nhận Check-in
+                        </button>
                     </div>
                 }
             </div>
