@@ -1,0 +1,51 @@
+﻿@model IEnumerable<QL_KhachSan.tblPhong>
+@{
+    ViewBag.Title = "Danh sách dọn dẹp";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4"><i class="fas fa-broom"></i> Công Việc Tiếp Tân & Tập Vụ</h2>
+
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-success text-center">
+                <i class="fas fa-check-circle"></i> Hiện tại tất cả các phòng đã sạch sẽ!
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm border-warning">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">P.@item.SoPhong (@item.tblLoaiPhong.TenLoai)</h5>
+                            <p class="card-text">
+                                <span class="badge bg-warning text-dark">Trạng thái: @item.TrangThai</span><br />
+                                <small class="text-muted">Tầng: @item.Tang</small>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("HoanTat", "TapVu", new { id = item.MaPhong })"
+                                   class="btn btn-success"
+                                   onclick="return confirm('Xác nhận phòng này đã dọn sạch và có thể đón khách?')">
+                                    <i class="fas fa-check"></i> Đã dọn xong
+                                </a>
+                                <a href="@Url.Action("BaoTri", "TapVu", new { id = item.MaPhong })"
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-tools"></i> Cần bảo trì
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="@Url.Action("Index", "Phong")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại Sơ đồ phòng
+        </a>
+    </div>
+</div>

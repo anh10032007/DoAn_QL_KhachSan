@@ -32,13 +32,12 @@ namespace QL_KhachSan.Controllers
         }
         public ActionResult Log()
         {
-            // Kiểm tra quyền Admin
             if (Session["User"] == null || Convert.ToInt32(Session["VaiTro"]) != 1)
                 return RedirectToAction("Login", "Account");
 
-            // Lấy danh sách log, sắp xếp mới nhất lên đầu
-            // Lưu ý: Tên bảng là tblNhatKyHoatDongs (có s)
+            // Load nhật ký kèm theo thông tin nhân viên (Lazy loading hoặc Eager loading)
             var logs = db.tblNhatKyHoatDongs
+                         .Include("tblNhanVien") // Đảm bảo lấy được TenNV
                          .OrderByDescending(x => x.ThoiGian)
                          .ToList();
 

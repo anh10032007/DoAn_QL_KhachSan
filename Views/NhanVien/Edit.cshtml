@@ -1,0 +1,46 @@
+﻿@model QL_KhachSan.tblNhanVien
+@{ ViewBag.Title = "Chỉnh sửa nhân viên"; }
+
+<div class="card shadow-sm mx-auto mt-4" style="max-width: 600px;">
+    <div class="card-header bg-warning text-dark fw-bold">
+        <i class="fas fa-user-edit"></i> CẬP NHẬT THÔNG TIN NHÂN VIÊN
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.MaNV)
+            @Html.HiddenFor(m => m.TenDangNhap)
+
+            <div class="mb-3">
+                <label class="form-label">Tên nhân viên</label>
+                @Html.TextBoxFor(m => m.TenNV, new { @class = "form-control", required = "required" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                @Html.TextBoxFor(m => m.SDT, new { @class = "form-control" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Chức vụ</label>
+                @Html.DropDownList("VaiTro", null, new { @class = "form-select" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu mới (để trống nếu không đổi)</label>
+                @Html.PasswordFor(m => m.MatKhau, new { @class = "form-control" })
+            </div>
+
+            <div class="mb-3 form-check">
+                @Html.CheckBox("TrangThai", Model.TrangThai ?? false, new { @class = "form-check-input", id = "status" })
+                <label class="form-check-label" for="status">Đang hoạt động</label>
+            </div>
+
+            <div class="text-end">
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        }
+    </div>
+</div>

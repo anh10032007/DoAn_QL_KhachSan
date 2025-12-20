@@ -1,6 +1,6 @@
 ﻿using QL_KhachSan;
 using QL_KhachSan.Models;
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace QL_KhachSan.Controllers
 {
+    [AdminAuthorize]
     public class NhanVienController : Controller
     {
         // Khởi tạo kết nối CSDL
@@ -71,6 +72,63 @@ namespace QL_KhachSan.Controllers
             ViewBag.VaiTro = new SelectList(db.tblVaiTroes, "IDVaiTro", "TenVaiTro", nv.VaiTro);
 
             return View(nv);
+        }
+        // 4. Giao diện Chỉnh sửa (GET)
+        public ActionResult Edit(int id)
+        {
+            var nv = db.tblNhanViens.Find(id);
+            if (nv == null) return HttpNotFound();
+
+            ViewBag.VaiTro = new SelectList(db.tblVaiTroes, "IDVaiTro", "TenVaiTro", nv.VaiTro);
+            return View(nv);
+        }
+
+        // 5. Xử lý cập nhật (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(tblNhanVien nv)
+        {
+            if (ModelState.IsValid)
+            {
+                var nvInDb = db.tblNhanViens.Find(nv.MaNV);
+                if (nvInDb != null)
+                {
+                    nvInDb.TenNV = nv.TenNV;
+                    nvInDb.SDT = nv.SDT;
+                    nvInDb.VaiTro = nv.VaiTro;
+                    nvInDb.TrangThai = nv.TrangThai;
+                    // Chỉ cập nhật mật khẩu nếu người dùng nhập mật khẩu mới
+                    if (!string.IsNullOrEmpty(nv.MatKhau))
+                    {
+                        nvInDb.MatKhau = nv.MatKhau;
+                    }
+
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            ViewBag.VaiTro = new SelectList(db.tblVaiTroes, "IDVaiTro", "TenVaiTro", nv.VaiTro);
+            return View(nv);
+        }
+
+        // 6. Xử lý Xóa (Thường dùng cách khóa tài khoản hoặc xóa hẳn)
+        public ActionResult Delete(int id)
+        {
+            var nv = db.tblNhanViens.Find(id);
+            if (nv != null)
+            {
+                // Kiểm tra nếu là chính mình thì không cho xóa
+                var adminHienTai = Session["User"] as tblNhanVien;
+                if (adminHienTai != null && adminHienTai.MaNV == id)
+                {
+                    TempData["Error"] = "Bạn không thể tự xóa chính mình!";
+                    return RedirectToAction("Index");
+                }
+
+                db.tblNhanViens.Remove(nv);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
     }
 }

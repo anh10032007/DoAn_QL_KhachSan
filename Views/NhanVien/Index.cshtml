@@ -36,7 +36,15 @@
                     @(item.TrangThai == true ? Html.Raw("<span class='text-success'><i class='fas fa-check-circle'></i> Hoạt động</span>") : Html.Raw("<span class='text-muted'>Đã khóa</span>"))
                 </td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-outline-warning"><i class="fas fa-edit"></i> Sửa</a>
+                    <a href="@Url.Action("Edit", new { id = item.MaNV })" class="btn btn-sm btn-outline-warning">
+                        <i class="fas fa-edit"></i> Sửa
+                    </a>
+
+                    <a href="@Url.Action("Delete", new { id = item.MaNV })"
+                       class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa nhân viên này?')">
+                        <i class="fas fa-trash"></i> Xóa
+                    </a>
                 </td>
             </tr>
         }

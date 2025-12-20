@@ -10,29 +10,61 @@ namespace QL_KhachSan.Controllers
 {
     public class PhongController : Controller
     {
-        // GET: Phong
+        // Khởi tạo kết nối CSDL
         QL_KhachSanEntities db = new QL_KhachSanEntities();
 
-        // 1. Danh sách phòng (Trang chủ quản lý phòng)
+        // ==========================================
+        // 1. DANH SÁCH PHÒNG (Ai cũng xem được)
+        // ==========================================
         public ActionResult Index()
         {
             var listPhong = db.tblPhongs.Include("tblLoaiPhong").ToList();
+
+            // --- LẤY ID HÓA ĐƠN ĐANG HOẠT ĐỘNG ---
+            // Logic: Tìm các hóa đơn chưa thanh toán để lấy ID trỏ link nút "Thanh toán"
+            var activeBills = db.tblChiTietHoaDons
+                                .Where(ct => ct.tblHoaDon.DaThanhToan == false)
+                                .Select(ct => new { ct.MaPhong, ct.MaHD })
+                                .ToDictionary(k => k.MaPhong, v => v.MaHD);
+
+            ViewBag.ActiveBills = activeBills;
+
             return View(listPhong);
         }
 
-        // 2. Giao diện Thêm phòng
+        // ==========================================
+        // HELPER: KIỂM TRA QUYỀN ADMIN
+        // ==========================================
+        private bool IsAdmin()
+        {
+            // Nếu chưa đăng nhập HOẶC Vai trò khác 1 (1=Admin) -> False
+            if (Session["User"] == null || Convert.ToInt32(Session["VaiTro"]) != 1)
+                return false;
+            return true;
+        }
+
+        // ==========================================
+        // 2. CHỨC NĂNG THÊM MỚI (CREATE) - CHỈ ADMIN
+        // ==========================================
+
+        // GET: Hiện form thêm mới
         public ActionResult Create()
         {
-            // Tạo Dropdown chọn Loại phòng
+            // Kiểm tra quyền: Nếu không phải Admin -> Đẩy về trang chủ
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai");
             return View();
         }
 
-        // 3. Xử lý Thêm phòng (POST)
+        // POST: Xử lý lưu
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(tblPhong p, HttpPostedFileBase HinhAnh)
         {
+            // Kiểm tra quyền
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             if (ModelState.IsValid)
             {
                 // Xử lý Upload ảnh
@@ -41,12 +73,10 @@ namespace QL_KhachSan.Controllers
                     string filename = Path.GetFileName(HinhAnh.FileName);
                     string path = Server.MapPath("~/Content/Images/");
 
-                    // Tạo thư mục nếu chưa có
                     if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
-                    // Lưu file
                     HinhAnh.SaveAs(path + filename);
-                    p.AnhDaiDien = filename; // Lưu tên file vào DB
+                    p.AnhDaiDien = filename;
                 }
 
                 p.TrangThai = "Trống"; // Mặc định khi tạo mới
@@ -58,87 +88,86 @@ namespace QL_KhachSan.Controllers
             ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", p.MaLoai);
             return View(p);
         }
+
         // ==========================================
-        // CHỨC NĂNG SỬA (EDIT)
+        // 3. CHỨC NĂNG SỬA (EDIT) - CHỈ ADMIN
         // ==========================================
 
-        // 4. Hiện giao diện sửa phòng (GET)
+        // GET: Hiện form sửa
         public ActionResult Edit(int id)
         {
-            // Tìm phòng theo ID
+            // Kiểm tra quyền
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             var phong = db.tblPhongs.Find(id);
             if (phong == null) return HttpNotFound();
 
-            // Load dropdown loại phòng, chọn sẵn loại hiện tại của phòng đó
             ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", phong.MaLoai);
-
             return View(phong);
         }
 
-        // 5. Xử lý cập nhật phòng (POST)
+        // POST: Xử lý cập nhật
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(tblPhong p, HttpPostedFileBase HinhAnh)
         {
+            // Kiểm tra quyền
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             if (ModelState.IsValid)
             {
-                // Lấy thông tin phòng cũ trong DB ra để sửa
                 var phongInDb = db.tblPhongs.Find(p.MaPhong);
-
                 if (phongInDb != null)
                 {
-                    // Cập nhật các thông tin văn bản
                     phongInDb.SoPhong = p.SoPhong;
                     phongInDb.Tang = p.Tang;
                     phongInDb.MaLoai = p.MaLoai;
                     phongInDb.MoTaChiTiet = p.MoTaChiTiet;
-                    // phongInDb.TrangThai = p.TrangThai; // Có thể cho sửa hoặc không tùy nghiệp vụ
 
-                    // Xử lý ảnh: Chỉ cập nhật nếu người dùng chọn ảnh mới
                     if (HinhAnh != null && HinhAnh.ContentLength > 0)
                     {
                         string filename = Path.GetFileName(HinhAnh.FileName);
                         string path = Server.MapPath("~/Content/Images/");
-
-                        // Xóa ảnh cũ nếu cần (tùy chọn)
-                        // if (System.IO.File.Exists(path + phongInDb.AnhDaiDien)) System.IO.File.Delete(path + phongInDb.AnhDaiDien);
-
                         HinhAnh.SaveAs(path + filename);
-                        phongInDb.AnhDaiDien = filename; // Cập nhật tên ảnh mới
+                        phongInDb.AnhDaiDien = filename;
                     }
 
-                    db.SaveChanges(); // Lưu thay đổi vào DB
+                    db.SaveChanges();
                     return RedirectToAction("Index");
                 }
             }
 
-            // Nếu lỗi, load lại dropdown
             ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", p.MaLoai);
             return View(p);
         }
 
         // ==========================================
-        // CHỨC NĂNG XÓA (DELETE)
+        // 4. CHỨC NĂNG XÓA (DELETE) - CHỈ ADMIN
         // ==========================================
 
-        // 6. Hiện xác nhận xóa (GET)
+        // GET: Hiện xác nhận xóa
         public ActionResult Delete(int id)
         {
+            // Kiểm tra quyền
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             var phong = db.tblPhongs.Find(id);
             if (phong == null) return HttpNotFound();
             return View(phong);
         }
 
-        // 7. Xử lý xóa (POST)
+        // POST: Xử lý xóa thật sự
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+            // Kiểm tra quyền
+            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+
             var phong = db.tblPhongs.Find(id);
             if (phong != null)
             {
-                // Kiểm tra xem phòng có đang nằm trong Hóa đơn nào không?
-                // Nếu có thì không được xóa (Ràng buộc khóa ngoại)
+                // Ràng buộc dữ liệu: Không xóa phòng đã từng có hóa đơn
                 bool dangSuDung = db.tblChiTietHoaDons.Any(x => x.MaPhong == id);
                 if (dangSuDung)
                 {
@@ -147,6 +176,23 @@ namespace QL_KhachSan.Controllers
                 }
 
                 db.tblPhongs.Remove(phong);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+
+        // ==========================================
+        // 5. CHỨC NĂNG KHÁC (Reset phòng)
+        // ==========================================
+
+        // Ai cũng có thể gọi hàm này (để Lễ tân fix lỗi trạng thái)
+        // Nếu muốn chỉ Admin thì thêm check IsAdmin() vào
+        public ActionResult ResetPhong(int id)
+        {
+            var phong = db.tblPhongs.Find(id);
+            if (phong != null)
+            {
+                phong.TrangThai = "Trống";
                 db.SaveChanges();
             }
             return RedirectToAction("Index");

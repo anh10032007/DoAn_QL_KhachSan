@@ -20,36 +20,29 @@ namespace QL_KhachSan.Controllers
 
         // 2. Xử lý nút Đăng nhập (POST)
         [HttpPost]
+    
         public ActionResult Login(string user, string pass)
         {
-            // Tìm nhân viên trong DB khớp tài khoản & mật khẩu
             var nv = db.tblNhanViens.FirstOrDefault(x => x.TenDangNhap == user && x.MatKhau == pass);
 
             if (nv != null)
             {
-                // Kiểm tra xem tài khoản có bị khóa không
                 if (nv.TrangThai == false)
                 {
                     ViewBag.Error = "Tài khoản đã bị khóa!";
                     return View();
                 }
 
-                // --- QUAN TRỌNG: Lưu thông tin vào Session ---
-                Session["User"] = nv;          // Lưu toàn bộ đối tượng nhân viên
+                // 1. Lưu thông tin vào Session
+                Session["User"] = nv;
                 Session["TenHienThi"] = nv.TenNV;
-                Session["VaiTro"] = nv.VaiTro; // Lưu vai trò (1=Admin, 2=NV...)
+                Session["VaiTro"] = nv.VaiTro;
 
-                // --- PHÂN QUYỀN CHUYỂN HƯỚNG ---
-                // Nếu là Admin (VaiTro = 1) -> Vào trang Báo cáo
-                if (nv.VaiTro == 1)
-                {
-                    return RedirectToAction("BaoCao", "Admin");
-                }
-                else
-                {
-                    // Nếu là Nhân viên -> Vào trang Đặt phòng hoặc Trang chủ
-                    return RedirectToAction("Index", "Home");
-                }
+                // 2. Ghi nhật ký đăng nhập thành công
+                LuuNhatKy("Đăng nhập", "Nhân viên " + nv.TenNV + " đã đăng nhập vào hệ thống.");
+
+                // 3. Trả về trang chủ (Home/Index)
+                return RedirectToAction("Index", "Home");
             }
             else
             {
@@ -58,6 +51,25 @@ namespace QL_KhachSan.Controllers
             }
         }
 
+        public void LuuNhatKy(string hanhDong, string ghiChu)
+        {
+            // Lấy thông tin nhân viên từ Session
+            var nv = Session["User"] as tblNhanVien;
+
+            tblNhatKyHoatDong log = new tblNhatKyHoatDong();
+            log.HanhDong = hanhDong;
+            log.GhiChu = ghiChu;
+            log.ThoiGian = DateTime.Now;
+
+            // Nếu đã đăng nhập thì lưu MaNV, nếu chưa (lúc đăng nhập lỗi) thì để null
+            if (nv != null)
+            {
+                log.MaNV = nv.MaNV;
+            }
+
+            db.tblNhatKyHoatDongs.Add(log);
+            db.SaveChanges();
+        }
         // 3. Đăng xuất
         public ActionResult Logout()
         {
