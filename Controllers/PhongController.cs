@@ -16,7 +16,6 @@ namespace QL_KhachSan.Controllers
         // 1. Danh sách phòng (Trang chủ quản lý phòng)
         public ActionResult Index()
         {
-            // Lấy danh sách phòng kèm thông tin loại phòng
             var listPhong = db.tblPhongs.Include("tblLoaiPhong").ToList();
             return View(listPhong);
         }

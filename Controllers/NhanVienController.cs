@@ -1,9 +1,10 @@
+﻿using QL_KhachSan;
+using QL_KhachSan.Models;
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using QL_KhachSan;
 
 namespace QL_KhachSan.Controllers
 {
