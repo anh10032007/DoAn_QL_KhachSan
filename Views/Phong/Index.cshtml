@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<QL_KhachSan.tblPhong>
 @{
     ViewBag.Title = "Sơ Đồ Phòng";
-    // Lấy quyền hiện tại: 1 = Admin, 2 = Nhân viên
+    // Lấy quyền hiện tại: 1 = Admin, 2 = Lễ tân, 3 = Tạp vụ
     int vaiTro = 0;
     if (Session["VaiTro"] != null)
     {
@@ -22,7 +22,7 @@
 </div>
 
 <div class="mb-4">
-    <span class="badge bg-success me-2 p-2">Trống</span>
+    <span class="badge bg-success me-2 p-2">Sạch (Trống)</span>
     <span class="badge bg-danger me-2 p-2">Đang có khách</span>
     <span class="badge bg-warning text-dark p-2">Đang dọn / Bảo trì</span>
 </div>
@@ -59,36 +59,46 @@
                     {
                         <img src="~/Content/Images/@item.AnhDaiDien" class="img-thumbnail mb-2" style="height: 100px; object-fit: cover; width: 100%;" />
                     }
+
+                    @* Hiển thị trạng thái bằng chữ để tạp vụ dễ nhận biết *@
+                    <div class="mt-2 fw-bold">
+                        <i class="fas fa-info-circle"></i> @item.TrangThai
+                    </div>
                 </div>
 
-                <div class="card-footer bg-white text-center">
-                    <div class="mb-2">
-                        @if (item.TrangThai == "Trống")
+                @* --- CHỈ HIỂN THỊ NÚT THAO TÁC NẾU KHÔNG PHẢI LÀ TẠP VỤ (VaiTro != 3) --- *@
+                @if (vaiTro != 3)
+                {
+                    <div class="card-footer bg-white text-center">
+                        <div class="mb-2">
+                            @if (item.TrangThai == "Trống")
+                            {
+                                <a href="@Url.Action("Create", "HoaDon", new { MaPhong = item.MaPhong })" class="btn btn-success btn-sm w-100 fw-bold">Check-in</a>
+                            }
+                            else if (item.TrangThai == "Đang ở")
+                            {
+                                <div class="btn-group w-100">
+                                    <a href="@Url.Action("Index", "HoaDon")" class="btn btn-danger btn-sm fw-bold">T.Toán</a>
+                                    <a href="@Url.Action("ResetPhong", "Phong", new { id = item.MaPhong })" class="btn btn-outline-danger btn-sm" onclick="return confirm('Reset trạng thái?');"><i class="fas fa-sync"></i></a>
+                                </div>
+                            }
+                        </div>
+
+                        @* Chức năng Sửa/Xóa dành riêng cho Admin *@
+                        @if (vaiTro == 1)
                         {
-                            <a href="@Url.Action("Create", "HoaDon", new { MaPhong = item.MaPhong })" class="btn btn-success btn-sm w-100 fw-bold">Check-in</a>
-                        }
-                        else if (item.TrangThai == "Đang ở")
-                        {
-                            <div class="btn-group w-100">
-                                <a href="@Url.Action("Index", "HoaDon")" class="btn btn-danger btn-sm fw-bold">T.Toán</a>
-                                <a href="@Url.Action("ResetPhong", "Phong", new { id = item.MaPhong })" class="btn btn-outline-danger btn-sm" onclick="return confirm('Reset trạng thái?');"><i class="fas fa-sync"></i></a>
+                            <hr class="my-1 text-muted">
+                            <div class="d-flex justify-content-center gap-2 mt-2">
+                                <a href="@Url.Action("Edit", "Phong", new { id = item.MaPhong })" class="btn btn-outline-primary btn-sm border-0"><i class="fas fa-edit"></i> Sửa</a>
+
+                                @if (item.TrangThai == "Trống")
+                                {
+                                    <a href="@Url.Action("Delete", "Phong", new { id = item.MaPhong })" class="btn btn-outline-secondary btn-sm border-0"><i class="fas fa-trash-alt"></i> Xóa</a>
+                                }
                             </div>
                         }
                     </div>
-
-                    @if (vaiTro == 1)
-                    {
-                        <hr class="my-1 text-muted">
-                        <div class="d-flex justify-content-center gap-2 mt-2">
-                            <a href="@Url.Action("Edit", "Phong", new { id = item.MaPhong })" class="btn btn-outline-primary btn-sm border-0"><i class="fas fa-edit"></i> Sửa</a>
-
-                            @if (item.TrangThai == "Trống")
-                            {
-                                <a href="@Url.Action("Delete", "Phong", new { id = item.MaPhong })" class="btn btn-outline-secondary btn-sm border-0"><i class="fas fa-trash-alt"></i> Xóa</a>
-                            }
-                        </div>
-                    }
-                </div>
+                }
             </div>
         </div>
     }

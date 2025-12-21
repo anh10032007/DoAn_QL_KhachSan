@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Trang Chủ - Dashboard";
+    int vt = Session["VaiTro"] != null ? Convert.ToInt32(Session["VaiTro"]) : 0;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
@@ -14,6 +15,7 @@
 </div>
 
 <div class="row g-3 mb-4">
+    @* Các thẻ thống kê số liệu *@
     <div class="col-md-3">
         <div class="card bg-primary text-white h-100 shadow-sm">
             <div class="card-body d-flex justify-content-between align-items-center">
@@ -68,6 +70,7 @@
 </div>
 
 <div class="row">
+    @* PHẦN CHỨC NĂNG THƯỜNG DÙNG ĐÃ ĐƯỢC PHÂN QUYỀN *@
     <div class="col-md-8">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white py-3">
@@ -75,22 +78,39 @@
             </div>
             <div class="card-body">
                 <div class="row text-center">
+                    @* Nút Sơ Đồ Phòng: Dùng chung cho tất cả các vai trò *@
                     <div class="col-4 mb-3">
                         <a href="@Url.Action("Index", "Phong")" class="btn btn-outline-primary w-100 py-3">
                             <i class="fas fa-th mb-2 fa-2x"></i><br>Sơ Đồ Phòng
                         </a>
                     </div>
-                    <div class="col-4 mb-3">
-                        <a href="@Url.Action("Create", "HoaDon")" class="btn btn-outline-success w-100 py-3">
-                            <i class="fas fa-key mb-2 fa-2x"></i><br>Check-in Khách
-                        </a>
-                    </div>
-                    <div class="col-4 mb-3">
-                        <a href="@Url.Action("Index", "HoaDon")" class="btn btn-outline-danger w-100 py-3">
-                            <i class="fas fa-file-invoice-dollar mb-2 fa-2x"></i><br>Trả Phòng / Hóa Đơn
-                        </a>
-                    </div>
-                    @if (Session["VaiTro"] != null && Convert.ToInt32(Session["VaiTro"]) == 1)
+
+                    @if (vt == 3)
+                    {
+                        @* CHẾ ĐỘ HIỂN THỊ CHO TẠP VỤ: Hiện nút Dọn dẹp, ẩn Check-in/Hóa đơn *@
+                        <div class="col-8 mb-3">
+                            <a href="@Url.Action("Index", "TapVu")" class="btn btn-outline-success w-100 py-3">
+                                <i class="fas fa-broom mb-2 fa-2x"></i><br>Công Việc Dọn Dẹp
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        @* CHẾ ĐỘ HIỂN THỊ CHO LỄ TÂN/ADMIN *@
+                        <div class="col-4 mb-3">
+                            <a href="@Url.Action("Create", "HoaDon")" class="btn btn-outline-success w-100 py-3">
+                                <i class="fas fa-key mb-2 fa-2x"></i><br>Check-in Khách
+                            </a>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <a href="@Url.Action("Index", "HoaDon")" class="btn btn-outline-danger w-100 py-3">
+                                <i class="fas fa-file-invoice-dollar mb-2 fa-2x"></i><br>Trả Phòng / Hóa Đơn
+                            </a>
+                        </div>
+                    }
+
+                    @* Các nút bổ sung chỉ dành cho Admin (Vai trò 1) *@
+                    @if (vt == 1)
                     {
                         <div class="col-4">
                             <a href="@Url.Action("Create", "NhanVien")" class="btn btn-outline-secondary w-100 py-3">
@@ -108,6 +128,7 @@
         </div>
     </div>
 
+    @* PHẦN LƯU Ý HỆ THỐNG *@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3">
@@ -115,6 +136,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
+                    @* Thông báo dọn dẹp rất quan trọng với nhân viên tạp vụ *@
                     @if (ViewBag.SoPhongDon > 0)
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center text-danger">
@@ -141,7 +163,6 @@
 
 @section scripts {
     <script>
-        // Hàm đồng hồ chạy theo thời gian thực
         function updateClock() {
             var now = new Date();
             var hours = String(now.getHours()).padStart(2, '0');
@@ -150,6 +171,6 @@
             document.getElementById('liveClock').textContent = hours + ":" + minutes + ":" + seconds;
         }
         setInterval(updateClock, 1000);
-        updateClock(); // Chạy ngay khi load trang
+        updateClock();
     </script>
 }

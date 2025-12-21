@@ -85,6 +85,20 @@
                                 </a>
                             </li>
                         }
+                        if (vt == 3)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active" href="@Url.Action("Index", "TapVu")">
+                                    <i class="fas fa-broom"></i> Công Việc Dọn Dẹp
+                                </a>
+                            </li>
+                        }
+
+                        // Menu nghiệp vụ (Admin + Lễ tân)
+                        if (vt == 1 || vt == 2)
+                        {
+                            // ... (giữ nguyên các menu cũ của Admin/Lễ tân)
+                        }
 
                         // Menu Quản trị (Chỉ Admin)
                         if (vt == 1)
@@ -101,6 +115,7 @@
                                 </ul>
                             </li>
                         }
+
                     }
                 </ul>
 

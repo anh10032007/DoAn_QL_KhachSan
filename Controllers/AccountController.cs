@@ -20,7 +20,8 @@ namespace QL_KhachSan.Controllers
 
         // 2. Xử lý nút Đăng nhập (POST)
         [HttpPost]
-    
+
+     
         public ActionResult Login(string user, string pass)
         {
             var nv = db.tblNhanViens.FirstOrDefault(x => x.TenDangNhap == user && x.MatKhau == pass);
@@ -38,10 +39,17 @@ namespace QL_KhachSan.Controllers
                 Session["TenHienThi"] = nv.TenNV;
                 Session["VaiTro"] = nv.VaiTro;
 
-                // 2. Ghi nhật ký đăng nhập thành công
-                LuuNhatKy("Đăng nhập", "Nhân viên " + nv.TenNV + " đã đăng nhập vào hệ thống.");
+                // 2. Ghi nhật ký
+                LuuNhatKy("Đăng nhập", "Nhân viên " + nv.TenNV + " đã đăng nhập.");
 
-                // 3. Trả về trang chủ (Home/Index)
+                // 3. ĐIỀU HƯỚNG DỰA TRÊN VAI TRÒ
+                // Thay số 3 bằng ID thực tế của vai trò Tạp vụ trong bảng tblVaiTro của bạn
+                if (nv.VaiTro == 3)
+                {
+                    return RedirectToAction("Index", "TapVu");
+                }
+
+                // Mặc định các vai trò khác (Admin, Lễ tân) về trang chủ
                 return RedirectToAction("Index", "Home");
             }
             else
