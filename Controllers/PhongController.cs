@@ -18,14 +18,22 @@ namespace QL_KhachSan.Controllers
         // ==========================================
         public ActionResult Index()
         {
-            var listPhong = db.tblPhongs.Include("tblLoaiPhong").ToList();
+            // BƯỚC 1: Lấy danh sách phòng từ DB về (chưa sắp xếp)
+            var listPhongRaw = db.tblPhongs.Include("tblLoaiPhong").ToList();
 
-            // --- LẤY ID HÓA ĐƠN ĐANG HOẠT ĐỘNG ---
-            // Logic: Tìm các hóa đơn chưa thanh toán để lấy ID trỏ link nút "Thanh toán"
+            // BƯỚC 2: Sắp xếp danh sách trong bộ nhớ (In-Memory Sorting)
+            // Logic: 
+            // - Ưu tiên độ dài chuỗi (VD: "2" dài 1 ký tự sẽ đứng trước "10" dài 2 ký tự)
+            // - Sau đó sắp xếp theo ký tự (VD: "101" đứng trước "102")
+            var listPhong = listPhongRaw.OrderBy(p => p.SoPhong.Length)
+                                        .ThenBy(p => p.SoPhong)
+                                        .ToList();
+
+            // --- LẤY ID HÓA ĐƠN ĐANG HOẠT ĐỘNG (Code cũ của bạn giữ nguyên) ---
             var activeBills = db.tblChiTietHoaDons
-                                .Where(ct => ct.tblHoaDon.DaThanhToan == false)
-                                .Select(ct => new { ct.MaPhong, ct.MaHD })
-                                .ToDictionary(k => k.MaPhong, v => v.MaHD);
+                            .Where(ct => ct.tblHoaDon.DaThanhToan == false)
+                            .Select(ct => new { ct.MaPhong, ct.MaHD })
+                            .ToDictionary(k => k.MaPhong, v => v.MaHD);
 
             ViewBag.ActiveBills = activeBills;
 
@@ -60,33 +68,52 @@ namespace QL_KhachSan.Controllers
         // POST: Xử lý lưu
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(tblPhong p, HttpPostedFileBase HinhAnh)
+       
+        public ActionResult Create(tblPhong phong, HttpPostedFileBase HinhAnh)
         {
-            // Kiểm tra quyền
-            if (!IsAdmin()) return RedirectToAction("Index", "Home");
+            // Kiểm tra quyền (như cũ)
+            if (Session["User"] == null || Convert.ToInt32(Session["VaiTro"]) != 1)
+                return RedirectToAction("Login", "Account");
 
             if (ModelState.IsValid)
             {
-                // Xử lý Upload ảnh
+                // --- BẮT ĐẦU ĐOẠN KIỂM TRA TRÙNG ---
+                // 1. Xóa khoảng trắng thừa (ví dụ " 101 " thành "101")
+                phong.SoPhong = phong.SoPhong.Trim();
+
+                // 2. Kiểm tra trong Database xem số phòng này đã tồn tại chưa
+                bool isDuplicate = db.tblPhongs.Any(x => x.SoPhong == phong.SoPhong);
+
+                if (isDuplicate)
+                {
+                    // Nếu trùng, thêm lỗi vào ModelState
+                    // "SoPhong" là tên trường (name) bên View để hiển thị lỗi ngay dưới ô nhập
+                    ModelState.AddModelError("SoPhong", "Lỗi: Số phòng " + phong.SoPhong + " đã tồn tại trong hệ thống!");
+
+                    // Trả lại View để người dùng nhập lại (không lưu vào DB)
+                    ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", phong.MaLoai);
+                    return View(phong);
+                }
+                // --- KẾT THÚC ĐOẠN KIỂM TRA TRÙNG ---
+
+                // Nếu không trùng thì xử lý ảnh và lưu bình thường
                 if (HinhAnh != null && HinhAnh.ContentLength > 0)
                 {
-                    string filename = Path.GetFileName(HinhAnh.FileName);
-                    string path = Server.MapPath("~/Content/Images/");
-
-                    if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
-                    HinhAnh.SaveAs(path + filename);
-                    p.AnhDaiDien = filename;
+                    string fileName = Path.GetFileName(HinhAnh.FileName);
+                    string path = Path.Combine(Server.MapPath("~/Content/Images/"), fileName);
+                    HinhAnh.SaveAs(path);
+                    phong.AnhDaiDien = fileName;
                 }
 
-                p.TrangThai = "Trống"; // Mặc định khi tạo mới
-                db.tblPhongs.Add(p);
+                phong.TrangThai = "Trống"; // Mặc định trạng thái
+                db.tblPhongs.Add(phong);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 
-            ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", p.MaLoai);
-            return View(p);
+            ViewBag.MaLoai = new SelectList(db.tblLoaiPhongs, "MaLoai", "TenLoai", phong.MaLoai);
+            return View(phong);
         }
 
         // ==========================================

@@ -22,8 +22,11 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Số Phòng <span class="text-danger">*</span></label>
-                                @Html.EditorFor(model => model.SoPhong, new { htmlAttributes = new { @class = "form-control", placeholder = "VD: 101, 205..." } })
-                                @Html.ValidationMessageFor(model => model.SoPhong, "", new { @class = "text-danger small" })
+
+                                @Html.EditorFor(model => model.SoPhong, new { htmlAttributes = new { @class = "form-control" } })
+
+                                @* Dòng này sẽ hiển thị lỗi trùng phòng *@
+                                @Html.ValidationMessageFor(model => model.SoPhong, "", new { @class = "text-danger small fw-bold" })
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Tầng <span class="text-danger">*</span></label>
